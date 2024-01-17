@@ -19,6 +19,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $institution = cleanInput($_POST["institution"]);
     $subscribe = isset($_POST["subscribe"]) ? "Yes" : "No";
     $degree = cleanInput($_POST["degree"]);
+    $cgpa = cleanInput($_POST["cgpa"]);
+    $selectedSkill = cleanInput($_POST["skills"]);
+    $reason=cleanInput($_POST["reason"]);
 
     // Validate data (perform additional validation as needed)
     $errors = [];
@@ -88,9 +91,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
+        $skillSql = "SELECT id FROM skills WHERE Skill='$selectedSkill'";
+        $result = $conn->query($skillSql);
 
-        $sql = "INSERT INTO user_info (firstName, lastName, age, gender, country, email, phone, address, city, zipcode, institution, degree, message, subscribe)
-                VALUES ('$firstName', '$lastName', $age, '$gender', '$country', '$email', '$phone', '$address', '$city', $zipcode, '$institution', '$degree', '$message', '$subscribe')";
+        if ($result && $result->num_rows > 0) {
+        // Fetch the id from the result set
+        $row = $result->fetch_assoc();
+        $id = $row['id'];
+    }
+
+        $sql = "INSERT INTO user_info (firstName, lastName, age, gender, country, email, phone, address, city, zipcode, institution, degree, message, subscribe,cgpa,reason,skill_id)
+                VALUES ('$firstName', '$lastName', $age, '$gender', '$country', '$email', '$phone', '$address', '$city', $zipcode, '$institution', '$degree', '$message', '$subscribe', '$cgpa','$reason','$id')";
 
         if ($conn->query($sql) === TRUE) {
             echo "New record created successfully";
