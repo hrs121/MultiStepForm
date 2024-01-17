@@ -56,13 +56,105 @@
             <label for="subscribe">Subscribe to Newsletter:</label>
             <input type="checkbox" id="subscribe" name="subscribe">
 
-            <div id="step3Error" class="error"></div>
-            <button type="button" onclick="prevStep('step3', 'step2')">Previous</button>
-            <button type="submit">Submit</button>
+            <label for="cgpa">CGPA:</label>
+            <input type="radio" id="under3" name="cgpa" value="under3" required>
+            <label for="under3">Under 3</label>
+
+
+            <input type="radio" id="4outof4" name="cgpa" value="4outof4" required>
+            <label for="4outof4">4 out of 4</label>
+
+            <input type="radio" id="above3below4" name="cgpa" value="above3below4" required>
+            <label for="above3below4">Above 3 and Below 4</label>
+
+
+    <!-- Reason container -->
+            <div id="reasonContainer" style="display: none;">
+            <label for="reason">Reason:</label>
+            <textarea id="reason" name="reason"></textarea>
+            </div>
+
+    <!-- Skill container -->
+            <div id="skillContainer" style="display: none;">
+                <label for="skills">Skills:</label>
+                <select id="skills" name="skills">
+                <?php
+                      // Fetch skills from the database
+                      $servername = "localhost";
+                      $username = "root";
+                      $password = "";
+                      $dbname = "form";
+
+                      $conn = new mysqli($servername, $username, $password, $dbname);
+
+                      if ($conn->connect_error) {
+                          die("Connection failed: " . $conn->connect_error);
+                      }
+
+                      $sqlSkills = "SELECT Skill FROM skills"; // Replace 'skills_table' with your actual table name
+                      $resultSkills = $conn->query($sqlSkills);
+
+                      // Check if skills were fetched successfully
+                      if ($resultSkills->num_rows > 0) {
+                          while ($row = $resultSkills->fetch_assoc()) {
+                              echo "<option value='" . $row['Skill'] . "'>" . $row['Skill'] . "</option>";
+                          }
+                      }
+
+                      $conn->close();
+            ?>
+                </select>
+            </div>
+
+          <div id="step3Error" class="error"></div>
+          <button type="button" onclick="prevStep('step3', 'step2')">Previous</button>
+          <button type="submit">Submit</button>
           </div>
+          </div>
+
         </form>
         
+
+
+
         <script>
+          document.addEventListener("DOMContentLoaded", function () {
+        var cgpaRadio = document.getElementsByName("cgpa");
+        var cgpaDetails = document.getElementById("cgpaDetails");
+
+        // Attach event listener to the radio buttons
+        for (var i = 0; i < cgpaRadio.length; i++) {
+            cgpaRadio[i].addEventListener("change", function () {
+                showHideCGPADetails(this.value);
+            });
+        }
+
+        // Function to show/hide CGPA details based on the selected radio option
+        function showHideCGPADetails(selectedOption) {
+            var reasonContainer = document.getElementById("reasonContainer");
+            var skillContainer = document.getElementById("skillContainer");
+
+            // Hide both containers by default
+            reasonContainer.style.display = "none";
+            skillContainer.style.display = "none";
+
+            // Show the selected container
+            if (selectedOption === "under3") {
+                reasonContainer.style.display = "block";
+            } else if (selectedOption === "4outof4") {
+                skillContainer.style.display = "block";
+            }
+        }
+
+        // Trigger the change event for the initially selected option
+        var initialSelectedOption = document.querySelector('input[name="cgpa"]:checked');
+        if (initialSelectedOption) {
+            showHideCGPADetails(initialSelectedOption.value);
+        }
+    });
+
+
+
           function validateNextStep(currentStepId, nextStepId) {
             var errorElement = document.getElementById(currentStepId + 'Error');
             var inputs = document.querySelectorAll('#' + currentStepId + ' input, #' + currentStepId + ' select, #' + currentStepId + ' textarea');
